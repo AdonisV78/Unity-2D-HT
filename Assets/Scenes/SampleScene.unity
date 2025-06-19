@@ -240,16 +240,18 @@ MonoBehaviour:
   specificHeat: 2
   widthPoints: 10
   heightPoints: 10
-  deltaTime: 1
+  deltaTime: 10
   deltaX: 1
   deltaY: 1
   heatCell: {fileID: 705444539778598545, guid: 89206aa2d6062844395ef9d242aa3b45, type: 3}
-  T1: 100
+  T1: 0
   T2: 0
   cellToBeHot: {x: 4, y: 4}
-  environmentTemperature: -20
+  tInfinity: 100
   isolatedSystem: 0
   isothermalHeatSource: 0
+  emissivity: 1
+  isPaused: 1
 --- !u!4 &1685445874
 Transform:
   m_ObjectHideFlags: 0
