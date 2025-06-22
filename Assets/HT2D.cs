@@ -11,12 +11,21 @@ public class HT2D : MonoBehaviour
     public float density = 7800f;             // ρ [kg/m³]
     public float specificHeat = 500f;         // cp [J/kg·K]
 
+<<<<<<< Updated upstream
     [Header("Simulation Settings")]
+=======
+    [Range(0f,1f)]
+    [Tooltip("For Radiative Transfer")]
+    public float emissivity = 1;
+
+    //[Header("Simulation Settings")]
+>>>>>>> Stashed changes
     public int widthPoints = 3;
     public int heightPoints = 3;
     
     private int numPoints; //How many points to be simulated
 
+<<<<<<< Updated upstream
     public float deltaTime = 0.01f; //How quickly the sumulation goes
     public float deltaX = 1f;
     public float deltaY = 1f;
@@ -34,6 +43,35 @@ public class HT2D : MonoBehaviour
     public Vector2 cellToBeHot;
 
     public float tInfinity = 20;
+=======
+    
+    public GameObject heatCell;
+    [Tooltip("(0,0) is the bottom left")]
+    public Vector2 cellToBeHot;
+
+    
+    public bool isolatedSystem = true;
+    public bool conductiveTransfer = true;
+    public bool convectiveTransfer = true;
+    public bool radiativeTransfer = true;
+    public bool isothermalHeatSource = true;
+
+
+    [Range(0.01f, 5f)]
+    public float deltaTime = 0.01f; //How quickly the sumulation goes
+
+    [Range(0.01f, 1f)]
+    public float deltaX = 1f;
+    [Range(0.01f, 1f)]
+    public float deltaY = 1f;
+
+
+
+    //[Header("Boundary Conditions (Temp in Celsius)")]
+    [Tooltip("Units of Celsius")]  public float T1 = 100;
+    [Tooltip("Units of Celsius")]  public float T2 = 0;
+    [Tooltip("Units of Celsius")] public float tInfinity = 20;
+>>>>>>> Stashed changes
 
     public bool isolatedSystem = true;
     public bool isothermalHeatSource = true;
@@ -69,7 +107,15 @@ public class HT2D : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+<<<<<<< Updated upstream
         SimulateHeatFourier();
+=======
+        if (!isPaused)
+        {
+            HeatTransferCalculation();
+        }
+
+>>>>>>> Stashed changes
         UpdateVisuals();
     }
 
@@ -88,8 +134,9 @@ public class HT2D : MonoBehaviour
         {
             for (int i = 0; i < widthPoints; i++)
             {
-                Vector3 pos = new Vector3(i - (widthPoints / 2), j - (heightPoints / 2), 0);
+                Vector3 pos = new Vector3((i - (widthPoints - 1) / 2f) * deltaX, (j - (heightPoints - 1) / 2f) * deltaY, 0);
                 visuals[getIndex(i, j)] = Instantiate(heatCell, pos, Quaternion.identity); //Generate the cells
+                visuals[getIndex(i, j)].transform.localScale = new Vector3 (deltaX, deltaY, 1f); //Scale the cells
 
                 heatCellPositions.Add(new Vector2Int(i, j));//low key might not need this, we'll see
 
