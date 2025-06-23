@@ -19,12 +19,16 @@ public class HT2D : MonoBehaviour
     public float emissivity = 1;
 
     //[Header("Simulation Settings")]
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
     public int widthPoints = 3;
     public int heightPoints = 3;
     
     private int numPoints; //How many points to be simulated
 
+<<<<<<< Updated upstream
 <<<<<<< Updated upstream
     public float deltaTime = 0.01f; //How quickly the sumulation goes
     public float deltaX = 1f;
@@ -44,6 +48,8 @@ public class HT2D : MonoBehaviour
 
     public float tInfinity = 20;
 =======
+=======
+>>>>>>> Stashed changes
     
     public GameObject heatCell;
     [Tooltip("(0,0) is the bottom left")]
@@ -66,6 +72,14 @@ public class HT2D : MonoBehaviour
     public float deltaY = 1f;
 
 
+<<<<<<< Updated upstream
+=======
+
+    //[Header("Boundary Conditions (Temp in Celsius)")]
+    [Tooltip("Units of Celsius")]  public float T1 = 100;
+    [Tooltip("Units of Celsius")]  public float T2 = 0;
+    [Tooltip("Units of Celsius")] public float tInfinity = 20;
+>>>>>>> Stashed changes
 
     //[Header("Boundary Conditions (Temp in Celsius)")]
     [Tooltip("Units of Celsius")]  public float T1 = 100;
@@ -108,8 +122,11 @@ public class HT2D : MonoBehaviour
     void Update()
     {
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         SimulateHeatFourier();
 =======
+=======
+>>>>>>> Stashed changes
         if (!isPaused)
         {
             HeatTransferCalculation();
