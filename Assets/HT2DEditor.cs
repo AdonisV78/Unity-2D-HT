@@ -14,6 +14,12 @@ public class HT2DEditor : Editor
 
     SerializedProperty emissivity;
 
+
+    SerializedProperty fluidDensity; // kg/m^3
+    SerializedProperty fluidThermalConductivity; // k [W/m·K]
+    SerializedProperty fluidDynamicViscosity; // k [W/m·K]
+
+
     SerializedProperty widthPoints;
     SerializedProperty heightPoints;
 
@@ -42,6 +48,9 @@ public class HT2DEditor : Editor
 
     SerializedProperty isPaused;
 
+    SerializedProperty fluidSpeed;
+    SerializedProperty fluidSource;
+
     bool simulationSettingsGroup;
     #endregion
 
@@ -53,6 +62,12 @@ public class HT2DEditor : Editor
 
 
         emissivity = serializedObject.FindProperty("emissivity");
+
+
+        fluidDensity = serializedObject.FindProperty("fluidDensity");
+        fluidThermalConductivity = serializedObject.FindProperty("fluidThermalConductivity");
+        fluidDynamicViscosity = serializedObject.FindProperty("fluidDynamicViscosity");
+
 
         widthPoints = serializedObject.FindProperty("widthPoints");
         heightPoints = serializedObject.FindProperty("heightPoints");
@@ -81,6 +96,9 @@ public class HT2DEditor : Editor
 
 
         isPaused = serializedObject.FindProperty("isPaused");
+
+        fluidSpeed = serializedObject.FindProperty("fluidSpeed");
+        fluidSource = serializedObject.FindProperty("fluidSource");
     }
     public override void OnInspectorGUI()
     {
@@ -92,6 +110,13 @@ public class HT2DEditor : Editor
         EditorGUILayout.PropertyField(density);
         EditorGUILayout.PropertyField(specificHeat);
         EditorGUILayout.PropertyField(emissivity);
+        
+        
+        EditorGUILayout.PropertyField(fluidDensity);
+        EditorGUILayout.PropertyField(fluidThermalConductivity);
+        EditorGUILayout.PropertyField(fluidDynamicViscosity);
+
+        EditorGUILayout.Space(10);
 
         simulationSettingsGroup = EditorGUILayout.BeginFoldoutHeaderGroup(simulationSettingsGroup, "Simulation Settings");
         if (simulationSettingsGroup)
@@ -121,25 +146,35 @@ public class HT2DEditor : Editor
             EditorGUILayout.PropertyField(T2);
             EditorGUILayout.PropertyField(tInfinity);
 
-            EditorGUILayout.Space(5);
-
-
             EditorGUILayout.Space(10);
 
             EditorGUILayout.PropertyField(conductiveTransfer);
             EditorGUILayout.PropertyField(isolatedSystem);
             if (!_HT2D.isolatedSystem)
             {
-                EditorGUILayout.PropertyField(convectiveTransfer);
+                EditorGUI.indentLevel++;
+               
+                EditorGUILayout.Space(1);
+
                 EditorGUILayout.PropertyField(radiativeTransfer);
+                
+                EditorGUILayout.Space(1);
+
+                EditorGUILayout.PropertyField(convectiveTransfer);
+               
+                EditorGUI.indentLevel++;
+               
+                EditorGUILayout.PropertyField(fluidSpeed);
+                EditorGUILayout.PropertyField(fluidSource);
+                
+                EditorGUI.indentLevel--;
+                EditorGUI.indentLevel--;
+
             }
             EditorGUILayout.Space(10);
         }
 
         EditorGUILayout.PropertyField(isPaused);
-
-
-
 
 
 

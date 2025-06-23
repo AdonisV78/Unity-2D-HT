@@ -16,6 +16,13 @@ public class HT2D : MonoBehaviour
     [Tooltip("For Radiative Transfer")]
     public float emissivity = 1;
 
+    [Header("Environmental Fluid Physical Parameters")]
+    public float fluidDensity = 1000; // kg/m^3
+    public float fluidThermalConductivity = 10; // k [W/m·K]
+    public float fluidDynamicViscosity = 10; // k [W/m·K]
+
+
+
     //[Header("Simulation Settings")]
     public int widthPoints = 3;
     public int heightPoints = 3;
@@ -59,7 +66,9 @@ public class HT2D : MonoBehaviour
     [Header("New Features")]
     public bool isPaused = true;
 
-    public enum windSourcePosition
+
+    public float fluidSpeed = 5f;
+    public enum fluidSourcePosition
     {
         Top,
         Bottom,
@@ -68,6 +77,7 @@ public class HT2D : MonoBehaviour
         everywhere
     }
 
+    public fluidSourcePosition fluidSource = fluidSourcePosition.Top;
 
     // Start is called before the first frame update
     void Start()
@@ -380,6 +390,18 @@ public class HT2D : MonoBehaviour
     {
         //Convective HT Here
         //Newtons law of cooling q" = h * deltaT
+        //In order to calculatea H, non dimenional numbers have to be used. Re and Nu
+
+        //Re = density * speed * Length / (dynamic viscosity)
+        float Re = fluidDensity;
+
+
+
+
+
+
+
+
         return 0;
 
     }
