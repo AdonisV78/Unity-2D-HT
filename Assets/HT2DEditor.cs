@@ -18,6 +18,7 @@ public class HT2DEditor : Editor
     SerializedProperty fluidDensity; // kg/m^3
     SerializedProperty fluidThermalConductivity; // k [W/m·K]
     SerializedProperty fluidDynamicViscosity; // k [W/m·K]
+    SerializedProperty fluidSpecificHeat;
 
 
     SerializedProperty widthPoints;
@@ -67,6 +68,7 @@ public class HT2DEditor : Editor
         fluidDensity = serializedObject.FindProperty("fluidDensity");
         fluidThermalConductivity = serializedObject.FindProperty("fluidThermalConductivity");
         fluidDynamicViscosity = serializedObject.FindProperty("fluidDynamicViscosity");
+        fluidSpecificHeat = serializedObject.FindProperty("fluidSpecificHeat");
 
 
         widthPoints = serializedObject.FindProperty("widthPoints");
@@ -115,6 +117,8 @@ public class HT2DEditor : Editor
         EditorGUILayout.PropertyField(fluidDensity);
         EditorGUILayout.PropertyField(fluidThermalConductivity);
         EditorGUILayout.PropertyField(fluidDynamicViscosity);
+        EditorGUILayout.PropertyField(fluidSpecificHeat);
+        
 
         EditorGUILayout.Space(10);
 
@@ -150,6 +154,7 @@ public class HT2DEditor : Editor
 
             EditorGUILayout.PropertyField(conductiveTransfer);
             EditorGUILayout.PropertyField(isolatedSystem);
+
             if (!_HT2D.isolatedSystem)
             {
                 EditorGUI.indentLevel++;

@@ -20,6 +20,7 @@ public class HT2D : MonoBehaviour
     public float fluidDensity = 1000; // kg/m^3
     public float fluidThermalConductivity = 10; // k [W/m·K]
     public float fluidDynamicViscosity = 10; // k [W/m·K]
+    public float fluidSpecificHeat = 4200f; // J/kg*k
 
 
 
@@ -172,7 +173,17 @@ public class HT2D : MonoBehaviour
             }
         }
 
+      
         temperatures[getIndex(Mathf.FloorToInt(cellToBeHot.x), Mathf.FloorToInt(cellToBeHot.y))] = T1;
+
+
+        //this is here because if the deltaTime is too big then everything dissapears
+        float stabilityLimit = (density * specificHeat * deltaX * deltaX) / (2 * thermalConductivity);
+        if (deltaTime > stabilityLimit)
+        {
+            Debug.LogWarning($"deltaTime too large for stability! Resetting to {stabilityLimit * 0.5f:F6} for stability.");
+            deltaTime = stabilityLimit * 0.5f; // Apply safety factor (50%)
+        }
     }
 
     float SimulateHeatFourier(int i, int j)
@@ -390,19 +401,81 @@ public class HT2D : MonoBehaviour
     {
         //Convective HT Here
         //Newtons law of cooling q" = h * deltaT
-        //In order to calculatea H, non dimenional numbers have to be used. Re and Nu
+        //In order to calculatea H, non dimenional numbers have to be used. Re, Nu, and Pr
+        //Assuming forced convection over each exposed surface
 
-        //Re = density * speed * Length / (dynamic viscosity)
-        float Re = fluidDensity;
-
-
+        //set the heat from each side to 0 to start
 
 
+        float qLeft = 0;
+        float qRight = 0;
+        float qUp = 0;
+        float qDown = 0;
+
+        int ThisBox = getIndex(i, j);
+
+        //calculate prandtl number 
+        float Pr = (specificHeat * fluidDensity) / fluidDynamicViscosity;
+
+        switch (fluidSource)
+        {
+            case fluidSourcePosition.Top:
+                
+                if ((j + 1) == heightPoints)
+                {
+                    //calculate reynolds number and leave a placehodler nusselt number
+                   float Re = (fluidDensity * fluidSpeed * (deltaX * widthPoints)) / fluidDynamicViscosity;
+                   float Nu = 0;
+
+                    //based on if its turbulent or not, use the appropriate correlation
+                   if (Re < 2000)
+                   {
+                        Nu = 0.564f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 0.4f);
+                   }
+                   else
+                   {
+                        Nu = 0.13f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 0.4f);
+                   }
+
+                   float h = Nu * (fluidThermalConductivity / (deltaX * widthPoints));
+                   qUp = -h * (temperatures[ThisBox] - tInfinity);
+
+                }
+                if((i - 1) < 0 || (i + 1) == widthPoints)
+                {
+                    //since I dont want all the points to have the same HT coefficeint on the sides, I am multiplying by * (i/widthPoints) 
+                    //this makes it so that at the end it uses the total h but at the begging it will use a smaller one
+                    float scaleFactor = Mathf.Max((i / heightPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
+
+                    float Re = (fluidDensity * fluidSpeed * (deltaY * scaleFactor * heightPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    if (Re < 5e5)
+                    {
+                        Nu = 0.664f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    else
+                    {
+                        Nu = 0.037f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    float h = Nu * (fluidThermalConductivity / (deltaY * scaleFactor * heightPoints));
+                 
+                    if((i - 1) < 0)
+                        qLeft = -h * (temperatures[ThisBox] - tInfinity);
+                    if ((i + 1) == widthPoints)
+                        qRight = -h * -(temperatures[ThisBox] - tInfinity);
+                }
+                    break;
+
+        }
 
 
 
 
-        return 0;
+        float dTdtx = (qLeft - qRight) / deltaX;
+        float dTdty = (qUp - qDown) / deltaY;
+
+        return (dTdtx + dTdty);
 
     }
 
