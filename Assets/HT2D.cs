@@ -4,6 +4,8 @@ using UnityEngine;
 using UnityEditor;
 using System;
 using System.ComponentModel;
+using UnityEngine.UI;
+using TMPro;
 
 public class HT2D : MonoBehaviour
 {
@@ -43,7 +45,7 @@ public class HT2D : MonoBehaviour
     public bool isothermalHeatSource = true;
 
 
-    [Range(0.01f, 5f)]
+    [Range(0.01f, 20f)]
     public float deltaTime = 0.01f; //How quickly the sumulation goes
 
     [Range(0.01f, 1f)]
@@ -66,7 +68,7 @@ public class HT2D : MonoBehaviour
 
     [Header("New Features")]
     public bool isPaused = true;
-
+    public bool showCellTemp = true;
 
     public float fluidSpeed = 5f;
     public enum fluidSourcePosition
@@ -140,12 +142,23 @@ public class HT2D : MonoBehaviour
             }
         }
 
+        //update temperatures and Text
         for (int j = 0; j < heightPoints; j++)
         {
             for (int i = 0; i < widthPoints; i++)
             {
-                //update temperatures to be displayed correctly
                 temperatures[getIndex(i, j)] = newTemperatures[getIndex(i, j)];
+
+                if (showCellTemp)
+                {
+                    Canvas canvas = visuals[getIndex(i, j)].GetComponentInChildren<Canvas>(true);
+                    TMP_Text heatText = canvas.GetComponentInChildren<TMP_Text>(true);
+
+                    if (heatText != null)
+                    {
+                        heatText.text = (Mathf.Round(temperatures[getIndex(i, j)])).ToString();
+                    }
+                }
             }
 
         }
@@ -159,9 +172,10 @@ public class HT2D : MonoBehaviour
         newTemperatures = new float[numPoints];
         visuals = new GameObject[numPoints];
 
-        
 
-        for (int j = 0; j < heightPoints; j++) //starts bottom left, then goes all the way right before going up one again
+        //starts bottom left, then goes all the way right before going up one again
+        //places the cells relative to eachother based on scale and centered on screen, also activates the temp text if desired
+        for (int j = 0; j < heightPoints; j++) 
         {
             for (int i = 0; i < widthPoints; i++)
             {
@@ -169,7 +183,16 @@ public class HT2D : MonoBehaviour
                 visuals[getIndex(i, j)] = Instantiate(heatCell, pos, Quaternion.identity);
                 visuals[getIndex(i, j)].transform.localScale = new Vector3(deltaX, deltaY, 1f);
 
-                temperatures[getIndex(i, j)] = T2; //make all the cells the cold temperature
+                if (showCellTemp)
+                {
+                    Canvas canvas = visuals[getIndex(i, j)].GetComponentInChildren<Canvas>(true);
+                    if (canvas != null)
+                    {
+                        canvas.gameObject.SetActive(true);
+                    }
+                }
+
+                temperatures[getIndex(i, j)] = T2; //makes the cells the cold temperature (T2)
             }
         }
 
@@ -178,12 +201,12 @@ public class HT2D : MonoBehaviour
 
 
         //this is here because if the deltaTime is too big then everything dissapears
-        float stabilityLimit = (density * specificHeat * deltaX * deltaX) / (2 * thermalConductivity);
-        if (deltaTime > stabilityLimit)
-        {
-            Debug.LogWarning($"deltaTime too large for stability! Resetting to {stabilityLimit * 0.5f:F6} for stability.");
-            deltaTime = stabilityLimit * 0.5f; // Apply safety factor (50%)
-        }
+        //float stabilityLimit = (density * specificHeat * deltaX * deltaX) / (2 * thermalConductivity);
+        //if (deltaTime > stabilityLimit)
+       // {
+           // Debug.LogWarning($"deltaTime too large for stability! Resetting to {stabilityLimit * 0.5f:F6} for stability.");
+            //deltaTime = stabilityLimit * 0.5f; // Apply safety factor (50%)
+       // }
     }
 
     float SimulateHeatFourier(int i, int j)
@@ -205,9 +228,9 @@ public class HT2D : MonoBehaviour
         //of the cells, but this works and is efficient enough for this. If i was to scale the project up I would change this.
 
         //This is in units of watts per meter squared
-        qRight = -thermalConductivity * (temperatures[Rightbox] - temperatures[ThisBox]) / deltaX;
+        qRight = -thermalConductivity * (temperatures[ThisBox] - temperatures[Rightbox]) / deltaX;
         qLeft = -thermalConductivity * (temperatures[ThisBox] - temperatures[LeftBox]) / deltaX;
-        qDown = -thermalConductivity * (temperatures[DownBox] - temperatures[ThisBox]) / deltaY;
+        qDown = -thermalConductivity * (temperatures[ThisBox] - temperatures[DownBox]) / deltaY;
         qUp = -thermalConductivity * (temperatures[ThisBox] - temperatures[UpBox]) / deltaY;
 
         if ((i - 1) < 0)
@@ -230,15 +253,16 @@ public class HT2D : MonoBehaviour
             qUp = 0;
         }
 
-        float dTdtx = (qLeft - qRight) / deltaX;
-        float dTdty = (qUp - qDown) / deltaY;
+        float dTdtx = (qLeft + qRight) / deltaX;
+        float dTdty = (qUp + qDown) / deltaY;
 
         return (dTdtx + dTdty);
     }
 
 
     /*
-    public void SimulateHeatFrier()
+    //used this at first before I decided to expand the project and include more than conductive transfer
+    public void SimulateHeatFourier()
     {
         //Fouriers Law of Heat Conduction: q" = -k * deltaT/deltaX
 
@@ -379,12 +403,12 @@ public class HT2D : MonoBehaviour
 
         if ((i + 1) == widthPoints)
         {
-            qRight = -(float)(emissivity * stephanBoltzmannConstant * -(Math.Pow(temperatures[ThisBox] + 273.15, 4) - Math.Pow(tInfinity + 273.15, 4)));
+            qRight = -(float)(emissivity * stephanBoltzmannConstant * (Math.Pow(temperatures[ThisBox] + 273.15, 4) - Math.Pow(tInfinity + 273.15, 4)));
         }
 
         if ((j - 1) < 0)
         {
-            qDown = -(float)(emissivity * stephanBoltzmannConstant * -(Math.Pow(temperatures[ThisBox] + 273.15, 4) - Math.Pow(tInfinity + 273.15, 4)));
+            qDown = -(float)(emissivity * stephanBoltzmannConstant * (Math.Pow(temperatures[ThisBox] + 273.15, 4) - Math.Pow(tInfinity + 273.15, 4)));
         }
 
         if ((j + 1) == heightPoints)
@@ -392,8 +416,8 @@ public class HT2D : MonoBehaviour
             qUp = -(float)(emissivity * stephanBoltzmannConstant * (Math.Pow(temperatures[ThisBox] + 273.15, 4) - Math.Pow(tInfinity + 273.15, 4)));
         }
 
-        float dTdtx = (qLeft - qRight) / deltaX;
-        float dTdty = (qUp - qDown) / deltaY;
+        float dTdtx = (qLeft + qRight) / deltaX;
+        float dTdty = (qUp + qDown) / deltaY;
 
         return (dTdtx + dTdty);
     }
@@ -406,7 +430,6 @@ public class HT2D : MonoBehaviour
 
         //set the heat from each side to 0 to start
 
-
         float qLeft = 0;
         float qRight = 0;
         float qUp = 0;
@@ -415,7 +438,8 @@ public class HT2D : MonoBehaviour
         int ThisBox = getIndex(i, j);
 
         //calculate prandtl number 
-        float Pr = (specificHeat * fluidDensity) / fluidDynamicViscosity;
+        float Pr = (fluidSpecificHeat * fluidDynamicViscosity) / fluidThermalConductivity;
+        //Debug.Log(Pr);
 
         switch (fluidSource)
         {
@@ -445,7 +469,7 @@ public class HT2D : MonoBehaviour
                 {
                     //since I dont want all the points to have the same HT coefficeint on the sides, I am multiplying by * (i/widthPoints) 
                     //this makes it so that at the end it uses the total h but at the begging it will use a smaller one
-                    float scaleFactor = Mathf.Max((i / heightPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
+                    float scaleFactor = Mathf.Max(((j) / heightPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
 
                     float Re = (fluidDensity * fluidSpeed * (deltaY * scaleFactor * heightPoints)) / fluidDynamicViscosity;
                     float Nu = 0;
@@ -463,17 +487,161 @@ public class HT2D : MonoBehaviour
                     if((i - 1) < 0)
                         qLeft = -h * (temperatures[ThisBox] - tInfinity);
                     if ((i + 1) == widthPoints)
-                        qRight = -h * -(temperatures[ThisBox] - tInfinity);
+                        qRight = -h * (temperatures[ThisBox] - tInfinity);
                 }
                     break;
 
+            case fluidSourcePosition.Bottom:
+
+                if ((j -1) < 0)
+                {
+                    //calculate reynolds number and leave a placehodler nusselt number
+                    float Re = (fluidDensity * fluidSpeed * (deltaX * widthPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    //based on if its turbulent or not, use the appropriate correlation
+                    if (Re < 2000)
+                    {
+                        Nu = 0.564f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 0.4f);
+                    }
+                    else
+                    {
+                        Nu = 0.13f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 0.4f);
+                    }
+
+                    float h = Nu * (fluidThermalConductivity / (deltaX * widthPoints));
+                    qDown = -h * (temperatures[ThisBox] - tInfinity);
+
+                }
+
+                if ((i - 1) < 0 || (i + 1) == widthPoints)
+                {
+                    //since I dont want all the points to have the same HT coefficeint on the sides, I am multiplying by * (i/widthPoints) 
+                    //this makes it so that at the end it uses the total h but at the begging it will use a smaller one
+                   
+                    //this becomes 1-... when flipped
+                    float scaleFactor = Mathf.Max( 1 - ((j) / heightPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
+
+                    float Re = (fluidDensity * fluidSpeed * (deltaY * scaleFactor * heightPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    if (Re < 5e5)
+                    {
+                        Nu = 0.664f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    else
+                    {
+                        Nu = 0.037f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    float h = Nu * (fluidThermalConductivity / (deltaY * scaleFactor * heightPoints));
+
+                    if ((i - 1) < 0)
+                        qLeft = -h * (temperatures[ThisBox] - tInfinity);
+                    if ((i + 1) == widthPoints)
+                        qRight = -h * (temperatures[ThisBox] - tInfinity);
+                }
+                break;
+
+            case fluidSourcePosition.Right:
+
+                if ((i + 1) == widthPoints)
+                {
+                    //calculate reynolds number and leave a placehodler nusselt number
+                    float Re = (fluidDensity * fluidSpeed * (deltaY * heightPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    //based on if its turbulent or not, use the appropriate correlation
+                    if (Re < 2000)
+                    {
+                        Nu = 0.564f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 0.4f);
+                    }
+                    else
+                    {
+                        Nu = 0.13f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 0.4f);
+                    }
+
+                    float h = Nu * (fluidThermalConductivity / (deltaY * heightPoints));
+                    qUp = -h * (temperatures[ThisBox] - tInfinity);
+
+                }
+                if ((j - 1) < 0 || (j + 1) == heightPoints)
+                {
+                    //since I dont want all the points to have the same HT coefficeint on the sides, I am multiplying by * (i/widthPoints) 
+                    //this makes it so that at the end it uses the total h but at the begging it will use a smaller one
+                    float scaleFactor = Mathf.Max(((i) / widthPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
+
+                    float Re = (fluidDensity * fluidSpeed * (deltaX * scaleFactor * widthPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    if (Re < 5e5)
+                    {
+                        Nu = 0.664f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    else
+                    {
+                        Nu = 0.037f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    float h = Nu * (fluidThermalConductivity / (deltaX * scaleFactor * widthPoints));
+
+                    if ((i - 1) < 0)
+                        qLeft = -h * (temperatures[ThisBox] - tInfinity);
+                    if ((i + 1) == widthPoints)
+                        qRight = -h * (temperatures[ThisBox] - tInfinity);
+                }
+                break;
+
+            case fluidSourcePosition.Left:
+
+                if ((i - 1) < 0)
+                {
+                    //calculate reynolds number and leave a placehodler nusselt number
+                    float Re = (fluidDensity * fluidSpeed * (deltaY * heightPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    //based on if its turbulent or not, use the appropriate correlation
+                    if (Re < 2000)
+                    {  
+                        Nu = 0.564f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 0.4f);
+                    }
+                    else
+                    {
+                        Nu = 0.13f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 0.4f);
+                    }
+
+                    float h = Nu * (fluidThermalConductivity / (deltaY * heightPoints));
+                    qUp = -h * (temperatures[ThisBox] - tInfinity);
+
+                }
+                if ((j - 1) < 0 || (j + 1) == heightPoints)
+                {
+                    //since I dont want all the points to have the same HT coefficeint on the sides, I am multiplying by * (i/widthPoints) 
+                    //this makes it so that at the end it uses the total h but at the begging it will use a smaller one
+                    float scaleFactor = Mathf.Max(1-((i) / widthPoints), 0.01f);// need to do this otherwise it will end up dividing by 0
+
+                    float Re = (fluidDensity * fluidSpeed * (deltaX * scaleFactor * widthPoints)) / fluidDynamicViscosity;
+                    float Nu = 0;
+
+                    if (Re < 5e5)
+                    {
+                        Nu = 0.664f * Mathf.Pow(Re, 0.5f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    else
+                    {
+                        Nu = 0.037f * Mathf.Pow(Re, 0.8f) * Mathf.Pow(Pr, 1f / 3f);
+                    }
+                    float h = Nu * (fluidThermalConductivity / (deltaX * scaleFactor * widthPoints));
+
+                    if ((i - 1) < 0)
+                        qLeft = -h * (temperatures[ThisBox] - tInfinity);
+                    if ((i + 1) == widthPoints)
+                        qRight = -h * (temperatures[ThisBox] - tInfinity);
+                }
+                break;
+
         }
 
-
-
-
-        float dTdtx = (qLeft - qRight) / deltaX;
-        float dTdty = (qUp - qDown) / deltaY;
+        float dTdtx = (qLeft + qRight) / deltaX;
+        float dTdty = (qUp + qDown) / deltaY;
 
         return (dTdtx + dTdty);
 

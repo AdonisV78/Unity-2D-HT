@@ -152,32 +152,33 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 40e231e9d12e5dc40bd0156267feec56, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  thermalConductivity: 250
-  density: 7800
-  specificHeat: 1
+  thermalConductivity: 50
+  density: 7850
+  specificHeat: 500
   emissivity: 1
-  fluidDensity: 1000
-  fluidThermalConductivity: 10
-  fluidDynamicViscosity: 10
-  fluidSpecificHeat: 4200
+  fluidDensity: 0.995
+  fluidThermalConductivity: 0.03
+  fluidDynamicViscosity: 0.00002082
+  fluidSpecificHeat: 1009
   widthPoints: 9
   heightPoints: 9
   heatCell: {fileID: 705444539778598545, guid: 89206aa2d6062844395ef9d242aa3b45, type: 3}
   cellToBeHot: {x: 4, y: 4}
-  isolatedSystem: 0
+  isolatedSystem: 1
   conductiveTransfer: 1
-  convectiveTransfer: 1
+  convectiveTransfer: 0
   radiativeTransfer: 0
-  isothermalHeatSource: 0
-  deltaTime: 0.1
+  isothermalHeatSource: 1
+  deltaTime: 5
   deltaX: 1
   deltaY: 1
-  T1: 0
+  T1: 100
   T2: 0
-  tInfinity: 100
+  tInfinity: 77
   isPaused: 0
-  fluidSpeed: 1
-  fluidSource: 0
+  showCellTemp: 1
+  fluidSpeed: 20
+  fluidSource: 1
 --- !u!4 &1061246834
 Transform:
   m_ObjectHideFlags: 0
@@ -190,7 +191,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
-  m_RootOrder: 1
+  m_RootOrder: 2
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1162693187
 GameObject:
@@ -261,6 +262,72 @@ Transform:
   m_GameObject: {fileID: 1162693187}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 1
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1705709787
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1705709790}
+  - component: {fileID: 1705709789}
+  - component: {fileID: 1705709788}
+  m_Layer: 0
+  m_Name: EventSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1705709788
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705709787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4f231c4fb786f3946a6b90b886c48677, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_HorizontalAxis: Horizontal
+  m_VerticalAxis: Vertical
+  m_SubmitButton: Submit
+  m_CancelButton: Cancel
+  m_InputActionsPerSecond: 10
+  m_RepeatDelay: 0.5
+  m_ForceModuleActive: 0
+--- !u!114 &1705709789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705709787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 76c392e42b5098c458856cdf6ecaaaa1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  m_FirstSelected: {fileID: 0}
+  m_sendNavigationEvents: 1
+  m_DragThreshold: 10
+--- !u!4 &1705709790
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1705709787}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}

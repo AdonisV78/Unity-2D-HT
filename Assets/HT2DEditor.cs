@@ -48,6 +48,7 @@ public class HT2DEditor : Editor
 
 
     SerializedProperty isPaused;
+    SerializedProperty showCellTemp;
 
     SerializedProperty fluidSpeed;
     SerializedProperty fluidSource;
@@ -98,6 +99,7 @@ public class HT2DEditor : Editor
 
 
         isPaused = serializedObject.FindProperty("isPaused");
+        showCellTemp = serializedObject.FindProperty("showCellTemp");
 
         fluidSpeed = serializedObject.FindProperty("fluidSpeed");
         fluidSource = serializedObject.FindProperty("fluidSource");
@@ -180,6 +182,7 @@ public class HT2DEditor : Editor
         }
 
         EditorGUILayout.PropertyField(isPaused);
+        EditorGUILayout.PropertyField(showCellTemp);
 
 
 
