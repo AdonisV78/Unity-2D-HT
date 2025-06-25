@@ -26,7 +26,7 @@ public class HT2DEditor : Editor
 
 
     SerializedProperty haveHeatSource;
-    SerializedProperty heatCell;
+    SerializedProperty heatCellObject;
     SerializedProperty cellsToBeHot;
 
     //bunch of bools
@@ -46,6 +46,9 @@ public class HT2DEditor : Editor
     SerializedProperty T1;
     SerializedProperty T2;
     SerializedProperty tInfinity;
+
+    SerializedProperty coldColorTemp;
+    SerializedProperty hotColorTemp;
 
 
     SerializedProperty isPaused;
@@ -78,7 +81,7 @@ public class HT2DEditor : Editor
 
 
         haveHeatSource = serializedObject.FindProperty("haveHeatSource");
-        heatCell = serializedObject.FindProperty("heatCell");
+        heatCellObject = serializedObject.FindProperty("heatCellObject");
         cellsToBeHot = serializedObject.FindProperty("cellsToBeHot");
 
         //bunch of bools
@@ -99,6 +102,10 @@ public class HT2DEditor : Editor
         T2 = serializedObject.FindProperty("T2");
         tInfinity = serializedObject.FindProperty("tInfinity");
 
+        coldColorTemp = serializedObject.FindProperty("coldColorTemp");
+        hotColorTemp = serializedObject.FindProperty("hotColorTemp");
+
+
 
         isPaused = serializedObject.FindProperty("isPaused");
         showCellTemp = serializedObject.FindProperty("showCellTemp");
@@ -110,6 +117,7 @@ public class HT2DEditor : Editor
     {
         HT2D _HT2D = (HT2D)target;
 
+        
         serializedObject.Update();
 
         EditorGUILayout.PropertyField(thermalConductivity);
@@ -128,8 +136,12 @@ public class HT2DEditor : Editor
 
         
 
+
+
         EditorGUI.indentLevel++;
-        
+            
+        EditorGUILayout.PropertyField(heatCellObject);
+
             EditorGUILayout.PropertyField(widthPoints);
             EditorGUILayout.PropertyField(heightPoints);
 
@@ -145,15 +157,17 @@ public class HT2DEditor : Editor
             EditorGUILayout.Space(10);
        
             EditorGUILayout.PropertyField(showCellTemp);
+       
+            EditorGUILayout.Space(5);
             EditorGUILayout.PropertyField(haveHeatSource);
 
-            EditorGUILayout.Space(5);
+            
 
         if (_HT2D.haveHeatSource)
         {
-            EditorGUILayout.PropertyField(heatCell);
-            EditorGUILayout.PropertyField(cellsToBeHot);
             EditorGUILayout.PropertyField(isothermalHeatSource);
+            EditorGUILayout.PropertyField(cellsToBeHot);
+            
            
             EditorGUILayout.Space(5);
         }
@@ -163,6 +177,10 @@ public class HT2DEditor : Editor
             EditorGUILayout.PropertyField(T1);
             EditorGUILayout.PropertyField(T2);
             EditorGUILayout.PropertyField(tInfinity);
+
+
+            EditorGUILayout.PropertyField(coldColorTemp);
+            EditorGUILayout.PropertyField(hotColorTemp);
 
             EditorGUILayout.Space(10);
 
@@ -204,7 +222,9 @@ public class HT2DEditor : Editor
         {
             _HT2D.PauseUnPause();
         }
-       
+
+        EditorGUILayout.Space(5);
+
         GUI.color = GUI.contentColor;
 
         if (GUILayout.Button("Reset Simulation"))
@@ -212,6 +232,8 @@ public class HT2DEditor : Editor
             _HT2D.ResetSimulation();
         }
 
+
+       
 
         serializedObject.ApplyModifiedProperties();
     }
