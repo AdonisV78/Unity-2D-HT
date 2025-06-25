@@ -163,7 +163,7 @@ MonoBehaviour:
   widthPoints: 9
   heightPoints: 9
   heatCell: {fileID: 705444539778598545, guid: 89206aa2d6062844395ef9d242aa3b45, type: 3}
-  cellToBeHot: {x: 4, y: 4}
+  cellsToBeHot: []
   isolatedSystem: 1
   conductiveTransfer: 1
   convectiveTransfer: 0
@@ -177,6 +177,7 @@ MonoBehaviour:
   tInfinity: 77
   isPaused: 0
   showCellTemp: 1
+  heatSource: 1
   fluidSpeed: 20
   fluidSource: 1
 --- !u!4 &1061246834

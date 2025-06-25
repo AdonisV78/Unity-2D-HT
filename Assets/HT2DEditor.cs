@@ -25,8 +25,9 @@ public class HT2DEditor : Editor
     SerializedProperty heightPoints;
 
 
+    SerializedProperty haveHeatSource;
     SerializedProperty heatCell;
-    SerializedProperty cellToBeHot;
+    SerializedProperty cellsToBeHot;
 
     //bunch of bools
     SerializedProperty isolatedSystem;
@@ -76,8 +77,9 @@ public class HT2DEditor : Editor
         heightPoints = serializedObject.FindProperty("heightPoints");
 
 
+        haveHeatSource = serializedObject.FindProperty("haveHeatSource");
         heatCell = serializedObject.FindProperty("heatCell");
-        cellToBeHot = serializedObject.FindProperty("cellToBeHot");
+        cellsToBeHot = serializedObject.FindProperty("cellsToBeHot");
 
         //bunch of bools
         isolatedSystem = serializedObject.FindProperty("isolatedSystem");
@@ -124,9 +126,10 @@ public class HT2DEditor : Editor
 
         EditorGUILayout.Space(10);
 
-        simulationSettingsGroup = EditorGUILayout.BeginFoldoutHeaderGroup(simulationSettingsGroup, "Simulation Settings");
-        if (simulationSettingsGroup)
-        {
+        
+
+        EditorGUI.indentLevel++;
+        
             EditorGUILayout.PropertyField(widthPoints);
             EditorGUILayout.PropertyField(heightPoints);
 
@@ -140,11 +143,20 @@ public class HT2DEditor : Editor
             EditorGUILayout.PropertyField(deltaTime);
 
             EditorGUILayout.Space(10);
+       
+            EditorGUILayout.PropertyField(showCellTemp);
+            EditorGUILayout.PropertyField(haveHeatSource);
 
+            EditorGUILayout.Space(5);
+
+        if (_HT2D.haveHeatSource)
+        {
             EditorGUILayout.PropertyField(heatCell);
-            EditorGUILayout.PropertyField(cellToBeHot);
-
+            EditorGUILayout.PropertyField(cellsToBeHot);
             EditorGUILayout.PropertyField(isothermalHeatSource);
+           
+            EditorGUILayout.Space(5);
+        }
 
             EditorGUILayout.Space(5);
 
@@ -179,13 +191,26 @@ public class HT2DEditor : Editor
 
             }
             EditorGUILayout.Space(10);
+        
+        EditorGUI.indentLevel--;
+
+
+
+        //using shorthand for if statments here when possible because I dont like how they look fully written out
+
+
+        GUI.color = _HT2D.isPaused ? Color.red : GUI.contentColor;
+        if (GUILayout.Button("Pause/Unpause Simulation"))
+        {
+            _HT2D.PauseUnPause();
         }
+       
+        GUI.color = GUI.contentColor;
 
-        EditorGUILayout.PropertyField(isPaused);
-        EditorGUILayout.PropertyField(showCellTemp);
-
-
-
+        if (GUILayout.Button("Reset Simulation"))
+        {
+            _HT2D.ResetSimulation();
+        }
 
 
         serializedObject.ApplyModifiedProperties();

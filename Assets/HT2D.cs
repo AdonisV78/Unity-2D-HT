@@ -6,6 +6,7 @@ using System;
 using System.ComponentModel;
 using UnityEngine.UI;
 using TMPro;
+using System.Linq;
 
 public class HT2D : MonoBehaviour
 {
@@ -26,7 +27,7 @@ public class HT2D : MonoBehaviour
 
 
 
-    //[Header("Simulation Settings")]
+    [Header("Simulation Settings")]
     public int widthPoints = 3;
     public int heightPoints = 3;
 
@@ -34,8 +35,11 @@ public class HT2D : MonoBehaviour
 
 
     public GameObject heatCell;
+
+    public bool haveHeatSource = true;
+
     [Tooltip("(0,0) is the bottom left")]
-    public Vector2 cellToBeHot;
+    public Vector2Int[] cellsToBeHot;
 
 
     public bool isolatedSystem = true;
@@ -56,7 +60,7 @@ public class HT2D : MonoBehaviour
 
 
     //[Header("Boundary Conditions (Temp in Celsius)")]
-    [Tooltip("Units of Celsius")] public float T1 = 100;
+    [Tooltip("Units of Celsius, For the Hot Cell")] public float T1 = 100;
     [Tooltip("Units of Celsius")] public float T2 = 0;
     [Tooltip("Units of Celsius")] public float tInfinity = 20;
 
@@ -69,6 +73,9 @@ public class HT2D : MonoBehaviour
     [Header("New Features")]
     public bool isPaused = true;
     public bool showCellTemp = true;
+    
+    
+
 
     public float fluidSpeed = 5f;
     public enum fluidSourcePosition
@@ -86,9 +93,10 @@ public class HT2D : MonoBehaviour
     void Start()
     {
         SetUp();
+        UpdateVisuals();
     }
 
-
+    
     // Update is called once per frame
     void Update()
     {
@@ -109,7 +117,7 @@ public class HT2D : MonoBehaviour
             {
 
                 //if I am keeping an isothermal heat cell, I want the cell to stay at its current temperature then proceed to the next cell to be checked
-                if (isothermalHeatSource && getIndex(i, j) == getIndex(Mathf.FloorToInt(cellToBeHot.x), Mathf.FloorToInt(cellToBeHot.y)))
+                if (isothermalHeatSource && isHotCell(i,j))
                 {
                     newTemperatures[getIndex(i, j)] = T1;
                     continue;
@@ -142,23 +150,12 @@ public class HT2D : MonoBehaviour
             }
         }
 
-        //update temperatures and Text
+        //update temperatures
         for (int j = 0; j < heightPoints; j++)
         {
             for (int i = 0; i < widthPoints; i++)
             {
                 temperatures[getIndex(i, j)] = newTemperatures[getIndex(i, j)];
-
-                if (showCellTemp)
-                {
-                    Canvas canvas = visuals[getIndex(i, j)].GetComponentInChildren<Canvas>(true);
-                    TMP_Text heatText = canvas.GetComponentInChildren<TMP_Text>(true);
-
-                    if (heatText != null)
-                    {
-                        heatText.text = (Mathf.Round(temperatures[getIndex(i, j)])).ToString();
-                    }
-                }
             }
 
         }
@@ -197,8 +194,13 @@ public class HT2D : MonoBehaviour
         }
 
       
-        temperatures[getIndex(Mathf.FloorToInt(cellToBeHot.x), Mathf.FloorToInt(cellToBeHot.y))] = T1;
-
+        if(cellsToBeHot.Length > 0)
+        {
+            foreach (Vector2Int cell in cellsToBeHot)
+            {
+                temperatures[getIndex(cell.x, cell.y)] = T1;
+            }
+        }
 
         //this is here because if the deltaTime is too big then everything dissapears
         //float stabilityLimit = (density * specificHeat * deltaX * deltaX) / (2 * thermalConductivity);
@@ -207,6 +209,31 @@ public class HT2D : MonoBehaviour
            // Debug.LogWarning($"deltaTime too large for stability! Resetting to {stabilityLimit * 0.5f:F6} for stability.");
             //deltaTime = stabilityLimit * 0.5f; // Apply safety factor (50%)
        // }
+    }
+
+    public void UpdateVisuals()
+    {
+        for (int j = 0; j < heightPoints; j++)
+        {
+            for (int i = 0; i < widthPoints; i++)
+            {
+                float tNorm = Mathf.InverseLerp(0, 100, temperatures[getIndex(i, j)]);
+                Color color = Color.Lerp(Color.blue, Color.red, tNorm);
+                visuals[getIndex(i, j)].GetComponent<SpriteRenderer>().color = color;
+
+                if (showCellTemp)
+                {
+                    Canvas canvas = visuals[getIndex(i, j)].GetComponentInChildren<Canvas>(true);
+                    TMP_Text heatText = canvas.GetComponentInChildren<TMP_Text>(true);
+
+                    if (heatText != null)
+                    {
+                        heatText.text = (Mathf.Round(temperatures[getIndex(i, j)])).ToString();
+                    }
+                }
+            }
+        }
+
     }
 
     float SimulateHeatFourier(int i, int j)
@@ -649,20 +676,7 @@ public class HT2D : MonoBehaviour
 
 
 
-    void UpdateVisuals()
-    {
-        for (int j = 0; j < heightPoints; j++)
-        {
-            for (int i = 0; i < widthPoints; i++)
-            {
-                float tNorm = Mathf.InverseLerp(0, 100, temperatures[getIndex(i, j)]);
-                Color color = Color.Lerp(Color.blue, Color.red, tNorm);
-                visuals[getIndex(i, j)].GetComponent<SpriteRenderer>().color = color;
-            }
-        }
-
-    }
-
+ 
     int getIndex(int x, int y) //way to make and recieve a unqiue index value based on the cells position.
     {
         if (x < 0 || x >= widthPoints || y < 0 || y >= heightPoints)
@@ -677,9 +691,44 @@ public class HT2D : MonoBehaviour
     }
 
 
+
+    public bool isHotCell(int i, int j)
+    {
+        Vector2Int thisCell = new Vector2Int(i, j);
+        return cellsToBeHot.Contains(thisCell);
+    }
     //This is for UI implementation of the simulation so it can all be controlled through the game screen
     public void PauseUnPause()
     {
         isPaused = (isPaused == true) ? false : true;
+    }
+
+
+    //Pause the simulation, destroy all the cells, clear all lists, then re-setup everything
+    public void ResetSimulation()
+    {
+        isPaused = true;
+
+        if (visuals != null)
+        {
+            foreach (GameObject cell in visuals)
+            {
+                if (cell != null)
+                {
+                    Destroy(cell);
+                }
+            }
+        }
+
+        temperatures = null;
+        newTemperatures = null;
+        visuals = null;
+
+        if (heatCellPositions != null)
+        {
+            heatCellPositions.Clear();
+        }
+
+        SetUp();
     }
 }
