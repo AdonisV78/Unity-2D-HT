@@ -147,9 +147,15 @@ public class OptimizedHT2D : MonoBehaviour
                 temperatures[getIndex(i,j)] = T2;
             }
         }
-        
-        foreach (Vector2Int hot in cellsToBeHot)
-            temperatures[getIndex(hot.x, hot.y)] = T1;
+
+        //makes all the desired cells hot
+        if (cellsToBeHot.Length > 0 && haveHeatSource)
+        {
+            foreach (Vector2Int cell in cellsToBeHot)
+            {
+                temperatures[getIndex(cell.x, cell.y)] = T1;
+            }
+        }
 
 
     }
@@ -180,7 +186,7 @@ public class OptimizedHT2D : MonoBehaviour
             {
 
                 //if I am keeping an isothermal heat cell, I want the cell to stay at its current temperature then proceed to the next cell to be checked
-                if (isothermalHeatSource && isHotCell(i, j))
+                if (haveHeatSource && isothermalHeatSource && isHotCell(i, j))
                 {
                     newTemperatures[getIndex(i, j)] = T1;
                     continue;

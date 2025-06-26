@@ -148,7 +148,7 @@ public class HT2D : MonoBehaviour
 
       
         //makes all the desired cells hot
-        if(cellsToBeHot.Length > 0)
+        if(cellsToBeHot.Length > 0 && haveHeatSource)
         {
             foreach (Vector2Int cell in cellsToBeHot)
             {
@@ -193,7 +193,7 @@ public class HT2D : MonoBehaviour
             {
 
                 //if I am keeping an isothermal heat cell, I want the cell to stay at its current temperature then proceed to the next cell to be checked
-                if (isothermalHeatSource && isHotCell(i, j))
+                if (haveHeatSource && isothermalHeatSource && isHotCell(i, j))
                 {
                     newTemperatures[getIndex(i, j)] = T1;
                     continue;

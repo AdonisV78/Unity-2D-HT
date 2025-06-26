@@ -326,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   thermalConductivity: 50
   density: 7850
-  specificHeat: 500
+  specificHeat: 5
   emissivity: 1
   fluidDensity: 0.995
   fluidThermalConductivity: 0.03
@@ -334,7 +334,7 @@ MonoBehaviour:
   fluidSpecificHeat: 1009
   widthPoints: 10
   heightPoints: 10
-  showCellTemp: 1
+  showCellTemp: 0
   heatCellObject: {fileID: 705444539778598545, guid: 89206aa2d6062844395ef9d242aa3b45, type: 3}
   haveHeatSource: 1
   cellsToBeHot:
