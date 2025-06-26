@@ -6,5 +6,7 @@ I tried to make all the variable names clear and add explanations of what they a
 The standard HT2D script is designed for visualizing actual numbers and heat transfer on a smaller scale, whereas the optimized HT2D script is intended for viewing how it would appear in the real world.
 This is because the optimized script edits the colors on a texture instead of game objects, so many more points (cells in the script) can be rendered, creating a higher resolution effect.
 
+If you find this project useful and want to expand upon it or use parts of it for anything you are working on, feel free to as long as I am properly credited.
+
 I may come back to this project in the future to expand the functionality, maybe adding the option to use different shapes, like a circle, or possibly having the option to use heat exchangers.
 In the meantime, I hope you enjoy using this, and thank you for taking the time to check it out.
