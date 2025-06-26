@@ -194,13 +194,16 @@ public class OptimizedHT2DEditor : Editor
 
             EditorGUILayout.PropertyField(convectiveTransfer);
 
-            EditorGUI.indentLevel++;
+            if (_HT2D.convectiveTransfer)
+            {
+                EditorGUI.indentLevel++;
 
-            EditorGUILayout.PropertyField(fluidSpeed);
-            EditorGUILayout.PropertyField(fluidSource);
+                EditorGUILayout.PropertyField(fluidSpeed);
+                EditorGUILayout.PropertyField(fluidSource);
 
-            EditorGUI.indentLevel--;
-            EditorGUI.indentLevel--;
+                EditorGUI.indentLevel--;
+                EditorGUI.indentLevel--;
+            }
 
         }
         EditorGUILayout.Space(10);

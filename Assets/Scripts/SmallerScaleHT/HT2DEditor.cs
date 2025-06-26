@@ -198,14 +198,18 @@ public class HT2DEditor : Editor
                 EditorGUILayout.Space(1);
 
                 EditorGUILayout.PropertyField(convectiveTransfer);
-               
+
+            if (_HT2D.convectiveTransfer)
+            {
                 EditorGUI.indentLevel++;
-               
+
                 EditorGUILayout.PropertyField(fluidSpeed);
                 EditorGUILayout.PropertyField(fluidSource);
-                
+
                 EditorGUI.indentLevel--;
                 EditorGUI.indentLevel--;
+            }
+
 
             }
             EditorGUILayout.Space(10);

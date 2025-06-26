@@ -62,9 +62,7 @@ public class OptimizedHT2D : MonoBehaviour
 
 
     //[Header("Boundary Conditions (Temp in Celsius)")]
-    [Range(0, 500f)]
     [Tooltip("Units of Celsius, For the Hot Cell")] public float T1 = 100;
-    [Range(0f, 500f)]
     [Tooltip("Units of Celsius")] public float T2 = 0;
     [Tooltip("Units of Celsius")] public float tInfinity = 20;
 
